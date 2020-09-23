@@ -15,17 +15,17 @@ const client = createClient({
 
 import theme from "../theme";
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: any) {
   return (
     <Provider value={client}>
       <ThemeProvider theme={theme}>
-        <ColorModeProvider>
-          {/* Permanently adds a light mode... Change this when needed... */}
-          <LightMode>
-            <CSSReset />
-            <Component {...pageProps} />
-          </LightMode>
-        </ColorModeProvider>
+        {/* <ColorModeProvider> */}
+        {/* Permanently adds a light mode... Change this when needed... */}
+        {/* <LightMode> */}
+        <CSSReset />
+        <Component {...pageProps} />
+        {/* </LightMode> */}
+        {/* </ColorModeProvider> */}
       </ThemeProvider>
     </Provider>
   );
