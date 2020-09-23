@@ -102,7 +102,6 @@ export class UserResolver {
           ],
         };
       }
-      //console.log("message: ", err.message);
 
       //stores user id session and logs them in as they register...
       req.session.userId = user.id;
