@@ -68,7 +68,16 @@ UserResponse = __decorate([
     type_graphql_1.ObjectType()
 ], UserResponse);
 let UserResolver = class UserResolver {
-    register(options, { em }) {
+    me({ req, em }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!req.session.userId) {
+                return null;
+            }
+            const user = yield em.findOne(User_1.User, { id: req.session.userId });
+            return user;
+        });
+    }
+    register(options, { em, req }) {
         return __awaiter(this, void 0, void 0, function* () {
             if (options.username.length <= 2) {
                 return {
@@ -105,17 +114,20 @@ let UserResolver = class UserResolver {
                 }
                 else {
                     return {
-                        errors: [{
+                        errors: [
+                            {
                                 field: "unknown",
-                                message: "login error!"
-                            }]
+                                message: "login error!",
+                            },
+                        ],
                     };
                 }
+                req.session.userId = user.id;
             }
             return { user };
         });
     }
-    login(options, { em }) {
+    login(options, { em, req }) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield em.findOne(User_1.User, { username: options.username });
             if (!user) {
@@ -129,10 +141,18 @@ let UserResolver = class UserResolver {
                     errors: [{ field: "password", message: "incorrect password" }],
                 };
             }
+            req.session.userId = user.id;
             return { user };
         });
     }
 };
+__decorate([
+    type_graphql_1.Query(() => User_1.User, { nullable: true }),
+    __param(0, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "me", null);
 __decorate([
     type_graphql_1.Mutation(() => UserResponse),
     __param(0, type_graphql_1.Arg("options")),
