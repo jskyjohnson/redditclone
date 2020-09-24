@@ -12,7 +12,7 @@ export default {
     pattern: /^[\w-]+\d+\.[tj]s$/,
   },
   dbName: "redditcl",
-  debug: !__prod__,
+  debug: true,//!__prod__,
   type: "postgresql",
   entities: [Post, User],
   user: process.env.DBUSER,

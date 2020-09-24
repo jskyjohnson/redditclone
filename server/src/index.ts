@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
@@ -11,10 +11,17 @@ import { UserResolver } from "./resolvers/user";
 import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
+import cors from "cors";
+// import { sendEmail } from "./utils/sendEmail";
 //import { MyContext } from "./types";
 require("dotenv").config();
 
 const main = async () => {
+  const today = new Date();
+  const time =
+    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  console.info("[ " + time + " ]-------------------------------");
+
   const orm = await MikroORM.init(microConfig);
   await orm.getMigrator().up();
 
@@ -23,11 +30,25 @@ const main = async () => {
   const RedisStore = connectRedis(session);
   const redisClient = redis.createClient();
 
+  redisClient.on("error", function (err) {
+    console.log("could not establish a connection with redis. " + err);
+  });
+  redisClient.on("connect", () => {
+    console.log("connected to redis successfully ");
+  });
+
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
+
   //console.log(__prod__);
 
   app.use(
     session({
-      name: "qid",
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redisClient,
         disableTouch: true,
@@ -39,7 +60,7 @@ const main = async () => {
         secure: __prod__, //cookie only works in https
       },
       saveUninitialized: false,
-      secret: process.env.SECRET || "",
+      secret: "qowiueojwojfalksdjoqiwueo",
       resave: false,
     })
   );
@@ -52,7 +73,7 @@ const main = async () => {
     context: ({ req, res }) => ({ em: orm.em, req, res }),
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log("server started on localhost:4000");
