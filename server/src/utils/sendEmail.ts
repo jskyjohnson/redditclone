@@ -1,6 +1,6 @@
 "use strict";
 const nodemailer = require("nodemailer");
-
+require("dotenv").config();
 // async..await is not allowed in global scope, must use a wrapper
 export async function sendEmail(to: string, subject: string, html: string) {
   //let testAccount = await nodemailer.createTestAccount();
@@ -26,5 +26,5 @@ export async function sendEmail(to: string, subject: string, html: string) {
 
   console.log("Message sent: %s", info.messageId);
 
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));require("dotenv").config()
 }

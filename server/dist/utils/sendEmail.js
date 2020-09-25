@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendEmail = void 0;
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 function sendEmail(to, subject, html) {
     return __awaiter(this, void 0, void 0, function* () {
         let transporter = nodemailer.createTransport({
@@ -30,6 +31,7 @@ function sendEmail(to, subject, html) {
         });
         console.log("Message sent: %s", info.messageId);
         console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        require("dotenv").config();
     });
 }
 exports.sendEmail = sendEmail;
