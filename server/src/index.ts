@@ -16,6 +16,10 @@ import { User } from "./entities/User";
 // import { sendEmail } from "./utils/sendEmail";
 //import { MyContext } from "./types";
 require("dotenv").config();
+import path from "path";
+import { Upvote } from "./entities/Upvote";
+import { createUserLoader } from "./utils/createUserLoader";
+import { createUpvoteLoader } from "./utils/createUpvoteLoader";
 
 const main = async () => {
   const today = new Date();
@@ -30,8 +34,12 @@ const main = async () => {
     password: process.env.DBPASS,
     logging: true,
     synchronize: true,
-    entities: [Post, User],
+    migrations: [path.join(__dirname, "./migrations/*")],
+    entities: [Post, User, Upvote],
   });
+
+  await conn.runMigrations();
+  // await Post.delete({});
 
   const app = express();
 
@@ -78,7 +86,13 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }) => ({ req, res, redis }),
+    context: ({ req, res }) => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader(),
+      upvoteLoader: createUpvoteLoader(),
+    }),
   });
 
   apolloServer.applyMiddleware({ app, cors: false });

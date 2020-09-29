@@ -28,6 +28,10 @@ const typeorm_1 = require("typeorm");
 const Post_1 = require("./entities/Post");
 const User_1 = require("./entities/User");
 require("dotenv").config();
+const path_1 = __importDefault(require("path"));
+const Upvote_1 = require("./entities/Upvote");
+const createUserLoader_1 = require("./utils/createUserLoader");
+const createUpvoteLoader_1 = require("./utils/createUpvoteLoader");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const today = new Date();
     const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -39,8 +43,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         password: process.env.DBPASS,
         logging: true,
         synchronize: true,
-        entities: [Post_1.Post, User_1.User],
+        migrations: [path_1.default.join(__dirname, "./migrations/*")],
+        entities: [Post_1.Post, User_1.User, Upvote_1.Upvote],
     });
+    yield conn.runMigrations();
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
     const redis = new ioredis_1.default();
@@ -75,7 +81,13 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             resolvers: [hello_1.HelloResolver, post_1.PostResolver, user_1.UserResolver],
             validate: false,
         }),
-        context: ({ req, res }) => ({ req, res, redis }),
+        context: ({ req, res }) => ({
+            req,
+            res,
+            redis,
+            userLoader: createUserLoader_1.createUserLoader(),
+            upvoteLoader: createUpvoteLoader_1.createUpvoteLoader(),
+        }),
     });
     apolloServer.applyMiddleware({ app, cors: false });
     app.listen(4000, () => {

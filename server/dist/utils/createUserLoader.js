@@ -8,16 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Migration20200924064946 = void 0;
-const migrations_1 = require("@mikro-orm/migrations");
-class Migration20200924064946 extends migrations_1.Migration {
-    up() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.addSql('alter table "user" add column "email" text not null;');
-            this.addSql('alter table "user" add constraint "user_email_unique" unique ("email");');
-        });
-    }
-}
-exports.Migration20200924064946 = Migration20200924064946;
-//# sourceMappingURL=Migration20200924064946.js.map
+exports.createUserLoader = void 0;
+const dataloader_1 = __importDefault(require("dataloader"));
+const User_1 = require("../entities/User");
+exports.createUserLoader = () => new dataloader_1.default((userIds) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield User_1.User.findByIds(userIds);
+    const userIdToUser = {};
+    users.forEach((u) => {
+        userIdToUser[u.id] = u;
+    });
+    return userIds.map((userId) => userIdToUser[userId]);
+}));
+//# sourceMappingURL=createUserLoader.js.map

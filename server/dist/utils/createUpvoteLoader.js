@@ -8,15 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Migration20200920034213 = void 0;
-const migrations_1 = require("@mikro-orm/migrations");
-class Migration20200920034213 extends migrations_1.Migration {
-    up() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.addSql('create table "post" ("id" serial primary key, "created_at" timestamptz(0) not null, "updated_at" timestamptz(0) not null, "title" text not null);');
-        });
-    }
-}
-exports.Migration20200920034213 = Migration20200920034213;
-//# sourceMappingURL=Migration20200920034213.js.map
+exports.createUpvoteLoader = void 0;
+const dataloader_1 = __importDefault(require("dataloader"));
+const Upvote_1 = require("../entities/Upvote");
+exports.createUpvoteLoader = () => new dataloader_1.default((keys) => __awaiter(void 0, void 0, void 0, function* () {
+    const upvotes = yield Upvote_1.Upvote.findByIds(keys);
+    const upvotesIdsToUpvote = {};
+    upvotes.forEach((upvote) => {
+        upvotesIdsToUpvote[`${upvote.userId}|${upvote.postId}`] = upvote;
+    });
+    return keys.map((key) => upvotesIdsToUpvote[`${key.userId}|${key.postId}`]);
+}));
+//# sourceMappingURL=createUpvoteLoader.js.map
