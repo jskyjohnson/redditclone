@@ -1,12 +1,14 @@
 import { Box, Button, Flex, Heading, Link } from "@chakra-ui/core";
-import React from "react";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
+import React from "react";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { isServer } from "../utils/isServer";
 
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
+  const router = useRouter();
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   const [{ data, fetching }] = useMeQuery({
     pause: isServer(),
@@ -29,23 +31,24 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     //user not logged in
   } else {
     body = (
-      <Flex align="center">
-        <NextLink href="/create-post">
-          <Button as={Link} mr={4}>
-            💬 Create Post
+        <Flex align="center">
+          <NextLink href="/create-post">
+            <Button as={Link} mr={4}>
+              💬 Create Post
+            </Button>
+          </NextLink>
+          <Box mr={4}>{data.me.username}</Box>
+          <Button
+            variant="link"
+            isLoading={logoutFetching}
+            onClick={async () => {
+              await logout();
+              router.reload();
+            }}
+          >
+            logout
           </Button>
-        </NextLink>
-        <Box mr={4}>{data.me.username}</Box>
-        <Button
-          variant="link"
-          isLoading={logoutFetching}
-          onClick={() => {
-            logout();
-          }}
-        >
-          logout
-        </Button>
-      </Flex>
+        </Flex>
     );
 
     //user is logged in
@@ -59,7 +62,10 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
           </Link>
         </NextLink>
 
-        <Box ml={"auto"}>{body}</Box>
+      <Box ml={"auto"}>
+        {body}
+
+      </Box>
       </Flex>
     </Flex>
   );

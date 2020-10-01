@@ -1,10 +1,9 @@
 import { Flex, IconButton } from "@chakra-ui/core";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   PostSnippetFragment,
-  PostsQuery,
-  useVoteMutation,
+
+  useVoteMutation
 } from "../generated/graphql";
 
 interface UpvoteSectionProps {
