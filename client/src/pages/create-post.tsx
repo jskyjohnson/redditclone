@@ -13,7 +13,7 @@ import { useIsAuth } from "../utils/useIsAuth";
 const CreatePost: React.FC<{}> = ({}) => {
   const router = useRouter();
   useIsAuth();
-  const [, createPost] = useCreatePostMutation();
+  const [createPost] = useCreatePostMutation();
   return (
     <Layout>
       <Wrapper variant="small">
@@ -21,9 +21,11 @@ const CreatePost: React.FC<{}> = ({}) => {
           initialValues={{ title: "", text: "" }}
           onSubmit={async (values) => {
             //console.log(values);
-            const { error } = await createPost({ input: values });
+            const { errors } = await createPost({
+              variables: { input: values },
+            });
 
-            if (!error) {
+            if (!errors) {
               router.push("/");
             }
           }}
@@ -55,4 +57,4 @@ const CreatePost: React.FC<{}> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(CreatePost);
+export default CreatePost;

@@ -1,12 +1,10 @@
 import { Box, Button, Flex, Heading, Link, Stack, Text } from "@chakra-ui/core";
-import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import { EditDeletePostButtons } from "../components/EditDeletePostButtons";
 import { Layout } from "../components/Layout";
 import { UpvoteSection } from "../components/UpvoteSection";
 import { usePostsQuery } from "../generated/graphql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -14,15 +12,15 @@ const Index = () => {
     cursor: null as null | string,
   });
 
-  const [{ data, error, fetching }] = usePostsQuery({
+  const { loading, data, error, called, client } = usePostsQuery({
     variables,
   });
 
-  if (!fetching && !data) {
+  //console.log(client);
+  if (!loading && !data) {
     return (
       <>
         <div> Query failed... </div>
-
 
         <div>{error?.message}</div>
       </>
@@ -30,7 +28,9 @@ const Index = () => {
   }
   return (
     <Layout>
-      {fetching && !data ? (
+      test loading
+      {data}
+      {loading && !data ? (
         <div>loading...</div>
       ) : (
         <Stack>
@@ -92,4 +92,4 @@ const Index = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default Index;
